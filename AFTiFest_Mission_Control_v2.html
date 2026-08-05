@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AFTiFest Project Command Center</title>
+<meta name="description" content="Interactive accountability, reporting, content calendar and timeline dashboard for AfroFutureTech iFest."/>
+<style>
+  :root{
+    --ink:#0b0b18; --navy:#111128; --paper:#f7f5ef; --lime:#caff1a;
+    --coral:#ff6b57; --violet:#7357ff; --purple:#a45cff; --blue:#2f7cff;
+    --muted:#77758a; --line:#dedbe8; --white:#ffffff; --green:#20b486;
+    --amber:#f4a621; --red:#e64e5d; --shadow:0 18px 55px rgba(17,17,40,.12);
+    --radius:24px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
+  button,input,select,textarea{font:inherit}
+  a{color:inherit}
+  .app{min-height:100vh;display:grid;grid-template-columns:280px 1fr}
+  aside{position:sticky;top:0;height:100vh;background:var(--ink);color:white;padding:26px 18px;overflow:auto}
+  .brand{display:flex;align-items:center;gap:12px;padding:0 8px 24px}
+  .mark{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--lime),var(--violet));display:grid;place-items:center;color:var(--ink);font-weight:1000;font-size:26px}
+  .brand b{font-size:18px}.brand small{display:block;color:#b7b4c7;margin-top:3px}
+  nav button{width:100%;border:0;background:transparent;color:#c9c6d8;padding:13px 14px;border-radius:14px;text-align:left;margin:3px 0;cursor:pointer;display:flex;gap:11px;align-items:center}
+  nav button:hover,nav button.active{background:#242342;color:white}
+  .side-card{margin-top:24px;border:1px solid #363451;border-radius:18px;padding:16px;background:linear-gradient(145deg,#1d1c38,#131329)}
+  .side-card strong{display:block;font-size:14px}.side-card p{font-size:12px;color:#bab7ca;line-height:1.5}
+  .side-card .progress{height:8px;background:#373551;border-radius:99px;overflow:hidden}.side-card .progress i{display:block;width:62%;height:100%;background:var(--lime)}
+  main{min-width:0}
+  header{position:sticky;top:0;z-index:8;background:rgba(247,245,239,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06);padding:18px 28px;display:flex;justify-content:space-between;align-items:center}
+  header h1{font-size:21px;margin:0} header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+  .header-actions{display:flex;gap:10px;align-items:center}.avatar{width:40px;height:40px;border-radius:50%;background:var(--violet);color:white;display:grid;place-items:center;font-weight:800}
+  .btn{border:0;border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:750}
+  .btn-primary{background:var(--lime);color:var(--ink)} .btn-dark{background:var(--ink);color:white}.btn-soft{background:white;border:1px solid var(--line)}
+  section.view{display:none;padding:28px}.view.active{display:block}
+  .hero{border-radius:32px;padding:32px;background:
+    radial-gradient(circle at 78% 20%,rgba(202,255,26,.26),transparent 28%),
+    radial-gradient(circle at 18% 95%,rgba(115,87,255,.42),transparent 28%),
+    linear-gradient(135deg,#111128,#211b4c 70%,#38266d);color:white;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-60px;bottom:-100px;width:320px;height:320px;border:1px solid rgba(255,255,255,.22);border-radius:50%;box-shadow:0 0 0 50px rgba(255,255,255,.035),0 0 0 100px rgba(255,255,255,.025)}
+  .eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:800;color:var(--lime)}
+  .hero h2{font-size:clamp(34px,5vw,70px);max-width:850px;line-height:.95;margin:15px 0}.hero p{max-width:760px;color:#d4d2df;line-height:1.6}
+  .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:23px}
+  .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px;max-width:690px}
+  .countdown div{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);border-radius:18px;padding:16px}.countdown b{font-size:30px}.countdown span{display:block;font-size:10px;color:#bbb8ca;text-transform:uppercase;letter-spacing:.16em}
+  .grid{display:grid;gap:18px}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{background:white;border:1px solid #ebe8f0;border-radius:var(--radius);padding:22px;box-shadow:0 8px 28px rgba(17,17,40,.055)}
+  .card h3{margin:0 0 12px}.metric strong{font-size:34px}.metric p{margin:5px 0;color:var(--muted);font-size:13px}.metric .tag{margin-top:12px}
+  .tag{display:inline-flex;padding:6px 9px;border-radius:99px;background:#f0eef8;font-size:11px;font-weight:750}.tag.green{background:#dcf8ef;color:#08735b}.tag.amber{background:#fff0d5;color:#9c5a00}.tag.red{background:#ffe1e5;color:#a52234}
+  .section-title{display:flex;justify-content:space-between;align-items:end;margin:28px 0 14px}.section-title h2{margin:0;font-size:27px}.section-title p{margin:5px 0 0;color:var(--muted)}
+  .bar{height:9px;background:#efedf5;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--lime))}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #ece9f1;font-size:13px;vertical-align:top}th{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .person{display:flex;gap:10px;align-items:center}.person .mini{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#ece8ff;color:#392bac;font-weight:800}
+  .status{padding:6px 9px;border-radius:99px;font-size:11px;font-weight:800;white-space:nowrap}.status.on{background:#dcf8ef;color:#08735b}.status.risk{background:#fff0d5;color:#8d5600}.status.off{background:#ffe1e5;color:#a52234}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{background:white;border:1px solid var(--line);padding:11px 12px;border-radius:12px;min-width:180px}
+  .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}.day{min-height:148px;background:white;border:1px solid #e7e3ee;border-radius:18px;padding:12px;cursor:pointer}.day:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.day .date{font-weight:900}.post{margin-top:9px;padding:8px;border-radius:11px;background:#f1effa;font-size:11px}.post strong{display:block}.post.today{background:#eefeae}
+  .timeline{position:relative;padding-left:25px}.timeline:before{content:"";position:absolute;left:8px;top:10px;bottom:10px;width:2px;background:#ded9ea}.milestone{position:relative;margin:0 0 18px;padding:17px;background:white;border:1px solid #e8e4ee;border-radius:18px}.milestone:before{content:"";position:absolute;left:-24px;top:23px;width:14px;height:14px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 6px #e7e2ff}.milestone.done:before{background:var(--green);box-shadow:0 0 0 6px #d9f7ee}.milestone.risk:before{background:var(--amber);box-shadow:0 0 0 6px #fff0d5}
+  .milestone h4{margin:0 0 5px}.milestone p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.milestone small{display:block;margin-top:9px;font-weight:800}
+  .dept-card{position:relative}.dept-card .icon{width:46px;height:46px;border-radius:15px;background:var(--ink);color:var(--lime);display:grid;place-items:center;font-size:22px}.dept-card h3{margin:18px 0 6px}.dept-card p{color:var(--muted);font-size:13px;min-height:38px}.dept-meta{display:flex;justify-content:space-between;font-size:12px;margin:12px 0}
+  dialog{border:0;border-radius:26px;padding:0;max-width:720px;width:calc(100% - 28px);box-shadow:0 30px 90px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(8,8,20,.65);backdrop-filter:blur(5px)}.modal-head{padding:22px 24px;background:var(--ink);color:white;display:flex;justify-content:space-between}.modal-body{padding:24px}.modal-body label{display:block;font-size:12px;font-weight:800;margin:12px 0 6px}.modal-body input,.modal-body select,.modal-body textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px}.modal-body textarea{min-height:110px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+  .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;overflow:auto}.column{background:#eeebf4;border-radius:20px;padding:12px;min-width:240px}.column h4{margin:5px 6px 12px}.task{background:white;border-radius:15px;padding:13px;margin:9px 0;border:1px solid #e2deea}.task b{font-size:13px}.task p{font-size:11px;color:var(--muted);line-height:1.4}.task-footer{display:flex;justify-content:space-between;align-items:center}
+  .empty{padding:32px;text-align:center;color:var(--muted)}
+  .notice{border-left:4px solid var(--amber);background:#fff5df;padding:13px 15px;border-radius:10px;font-size:13px}
+  .role-switch{background:#22213d;color:white;border:1px solid #3a3855;border-radius:10px;padding:8px}
+  @media(max-width:1050px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}.kanban{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:760px){.app{grid-template-columns:1fr}aside{position:fixed;z-index:20;left:-290px;width:280px;transition:.25s}.app.menu-open aside{left:0}header{padding:14px 16px}section.view{padding:17px}.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}.countdown{grid-template-columns:repeat(2,1fr)}.calendar{grid-template-columns:1fr}.day{min-height:auto}.kanban{grid-template-columns:1fr}.hide-mobile{display:none}.hero{padding:24px}.hero h2{font-size:42px}.menu-btn{display:block!important}}
+  .menu-btn{display:none}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<aside>
+  <div class="brand">
+    <div class="mark">iF</div>
+    <div><b>AFTiFest Command Center</b><small>Alignment • Accountability • Action</small></div>
+  </div>
+  <nav id="nav">
+    <button class="active" data-view="overview">◫ Executive Overview</button>
+    <button data-view="departments">◉ Departments & People</button>
+    <button data-view="tasks">✓ Tasks & Accountability</button>
+    <button data-view="reports">▤ Department Reports</button>
+    <button data-view="content">▦ Social Content Calendar</button>
+    <button data-view="timeline">↗ Road to iFest</button>
+    <button data-view="governance">♛ Governance Room</button>
+    <button data-view="resources">⬡ Resources & Links</button>
+    <button data-view="settings">⚙ Workspace Settings</button>
+  </nav>
+  <div class="side-card">
+    <strong>Festival readiness</strong>
+    <p>Prototype score calculated from milestone completion and department health.</p>
+    <div class="progress"><i id="sideProgress"></i></div>
+    <p><b id="sidePercent">62%</b> ready</p>
+  </div>
+</aside>
+
+<main>
+<header>
+  <div style="display:flex;gap:12px;align-items:center">
+    <button class="btn btn-soft menu-btn" onclick="document.getElementById('app').classList.toggle('menu-open')">☰</button>
+    <div><h1 id="pageTitle">Executive Overview</h1><p id="pageSub">One source of truth for leadership and delivery teams.</p></div>
+  </div>
+  <div class="header-actions">
+    <select id="roleSwitch" class="role-switch" title="Preview role">
+      <option>Executive</option><option>Advisory Board</option><option>Patron</option><option>Department Lead</option><option>Team Member</option>
+    </select>
+    <button class="btn btn-primary hide-mobile" onclick="openReport()">+ Submit report</button>
+    <div class="avatar">JO</div>
+  </div>
+</header>
+
+<section id="overview" class="view active">
+  <div class="hero">
+    <div class="eyebrow">AfroFutureTech iFest 2026 • Project Intelligence Layer</div>
+    <h2>Everyone aligned.<br/>Every task visible.</h2>
+    <p>A shared operational interface for Patrons, Advisory Board, EXCO, department leads and execution teams—connecting strategy, reporting, social content, milestones and accountability.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showView('tasks')">View today’s priorities</button>
+      <button class="btn btn-soft" onclick="showView('content')">Open content calendar</button>
+      <button class="btn btn-soft" onclick="openReport()">Submit department report</button>
+    </div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <div class="section-title"><div><h2>Leadership snapshot</h2><p>Illustrative prototype data—replace with the approved team roster and targets.</p></div><button class="btn btn-soft" onclick="exportWorkspace()">Export workspace</button></div>
+  <div class="grid grid-4">
+    <div class="card metric"><span class="tag green">On track</span><strong id="metricReadiness">62%</strong><p>Overall festival readiness</p></div>
+    <div class="card metric"><span class="tag">Across teams</span><strong id="metricTasks">24</strong><p>Open priority tasks</p></div>
+    <div class="card metric"><span class="tag amber">Needs review</span><strong id="metricRisk">4</strong><p>Items currently at risk</p></div>
+    <div class="card metric"><span class="tag green">This week</span><strong id="metricPosts">12</strong><p>Scheduled content assets</p></div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:18px">
+    <div class="card">
+      <h3>Department health</h3>
+      <div id="deptHealth"></div>
+    </div>
+    <div class="card">
+      <h3>Today's command brief</h3>
+      <div id="todayBrief"></div>
+    </div>
+  </div>
+
+  <div class="section-title"><div><h2>Priority accountability</h2><p>High-impact actions leadership should monitor.</p></div></div>
+  <div class="card" style="overflow:auto"><table><thead><tr><th>Priority</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Progress</th></tr></thead><tbody id="priorityTable"></tbody></table></div>
+</section>
+
+<section id="departments" class="view">
+  <div class="section-title"><div><h2>Departments & people</h2><p>Clear ownership, reporting lines and performance visibility.</p></div><button class="btn btn-primary" onclick="openDepartment()">+ Add department</button></div>
+  <div class="toolbar"><input id="deptSearch" placeholder="Search departments or leads…" oninput="renderDepartments()"/><select id="deptStatus" onchange="renderDepartments()"><option value="">All health statuses</option><option>On Track</option><option>At Risk</option><option>Blocked</option></select></div>
+  <div class="grid grid-3" id="departmentGrid"></div>
+</section>
+
+<section id="tasks" class="view">
+  <div class="section-title"><div><h2>Tasks & accountability</h2><p>Work moves through a visible delivery pipeline.</p></div><button class="btn btn-primary" onclick="openTask()">+ Create task</button></div>
+  <div class="toolbar"><select id="taskDept" onchange="renderTasks()"><option value="">All departments</option></select><select id="taskOwner" onchange="renderTasks()"><option value="">All owners</option></select><input id="taskSearch" placeholder="Search tasks…" oninput="renderTasks()"/></div>
+  <div class="kanban" id="kanban"></div>
+</section>
+
+<section id="reports" class="view">
+  <div class="section-title"><div><h2>Department reporting</h2><p>Weekly updates: wins, blockers, next actions and leadership requests.</p></div><button class="btn btn-primary" onclick="openReport()">+ Submit report</button></div>
+  <div class="grid grid-4">
+    <div class="card metric"><strong id="reportCount">0</strong><p>Reports submitted</p></div>
+    <div class="card metric"><strong id="reportOnTime">0%</strong><p>On-time reporting rate</p></div>
+    <div class="card metric"><strong id="reportBlockers">0</strong><p>Open blockers</p></div>
+    <div class="card metric"><strong id="reportRequests">0</strong><p>Leadership decisions requested</p></div>
+  </div>
+  <div class="section-title"><div><h2>Recent submissions</h2></div></div>
+  <div class="card" style="overflow:auto"><table><thead><tr><th>Date</th><th>Department</th><th>Reporter</th><th>Summary</th><th>Health</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+</section>
+
+<section id="content" class="view">
+  <div class="section-title"><div><h2>Social media calendar</h2><p>What is being posted, where, when and by whom.</p></div><button class="btn btn-primary" onclick="openPost()">+ Schedule content</button></div>
+  <div class="toolbar"><select id="contentPlatform" onchange="renderCalendar()"><option value="">All platforms</option><option>Instagram</option><option>LinkedIn</option><option>TikTok</option><option>X</option><option>YouTube</option><option>WhatsApp</option></select><select id="contentStatus" onchange="renderCalendar()"><option value="">All statuses</option><option>Idea</option><option>In Production</option><option>Awaiting Approval</option><option>Approved</option><option>Published</option></select><button class="btn btn-soft" onclick="exportContentCSV()">Export CSV</button></div>
+  <div class="notice">Tip: paste final asset links from Google Drive or Canva into each content item so team members can open, review and publish from this interface.</div>
+  <div class="calendar" id="calendar" style="margin-top:16px"></div>
+</section>
+
+<section id="timeline" class="view">
+  <div class="section-title"><div><h2>Road to iFest</h2><p>Milestones counting down to 4–6 December 2026. Event dates are editable in Settings.</p></div><button class="btn btn-primary" onclick="openMilestone()">+ Add milestone</button></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Readiness by workstream</h3>
+      <div id="workstreamReadiness"></div>
+    </div>
+    <div><div class="timeline" id="timelineList"></div></div>
+  </div>
+</section>
+
+<section id="governance" class="view">
+  <div class="section-title"><div><h2>Governance room</h2><p>High-level visibility for Patrons, Advisory Board and EXCO.</p></div></div>
+  <div class="grid grid-3">
+    <div class="card"><div class="eyebrow" style="color:var(--violet)">Patrons Board</div><h3>Influence & advocacy</h3><p>Strategic introductions, prestige, public support and institutional access.</p><button class="btn btn-soft">Open patron brief</button></div>
+    <div class="card"><div class="eyebrow" style="color:var(--violet)">Advisory Board</div><h3>Guidance & credibility</h3><p>Review key decisions, identify risk and provide sector-level intelligence.</p><button class="btn btn-soft">Open advisory pack</button></div>
+    <div class="card"><div class="eyebrow" style="color:var(--violet)">EXCO</div><h3>Execution & accountability</h3><p>Own departmental targets, approve deliverables and resolve blockers.</p><button class="btn btn-soft">Open EXCO actions</button></div>
+  </div>
+  <div class="section-title"><div><h2>Decisions requiring leadership</h2></div></div>
+  <div class="card" id="decisionList"></div>
+</section>
+
+<section id="resources" class="view">
+  <div class="section-title"><div><h2>Resources & links</h2><p>A single doorway to documents, forms, assets and meetings.</p></div><button class="btn btn-primary" onclick="openResource()">+ Add resource</button></div>
+  <div class="grid grid-3" id="resourceGrid"></div>
+</section>
+
+<section id="settings" class="view">
+  <div class="section-title"><div><h2>Workspace settings</h2><p>Configure the prototype before connecting a real backend.</p></div></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Event configuration</h3>
+      <label>Event start date</label><input id="eventStart" type="date"/>
+      <label>Event end date</label><input id="eventEnd" type="date"/>
+      <label>Workspace name</label><input id="workspaceName"/>
+      <div style="margin-top:14px"><button class="btn btn-dark" onclick="saveSettings()">Save settings</button></div>
+    </div>
+    <div class="card">
+      <h3>Data controls</h3>
+      <p style="color:var(--muted)">This prototype stores edits in the current browser using localStorage. For multi-user collaboration, connect it to Firebase, Supabase, WordPress REST API or your existing application backend.</p>
+      <button class="btn btn-soft" onclick="exportWorkspace()">Export JSON backup</button>
+      <button class="btn btn-soft" onclick="document.getElementById('importFile').click()">Import JSON</button>
+      <input id="importFile" type="file" accept=".json" hidden onchange="importWorkspace(event)"/>
+      <button class="btn btn-soft" onclick="resetWorkspace()">Reset demo data</button>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<dialog id="modal"><div class="modal-head"><strong id="modalTitle">Add</strong><button class="btn btn-soft" onclick="closeModal()">✕</button></div><div class="modal-body" id="modalBody"></div></dialog>
+
+<script>
+const defaultData = {
+ settings:{workspaceName:"AFTiFest Project Command Center",eventStart:"2026-12-04",eventEnd:"2026-12-06"},
+ departments:[
+  {id:1,name:"Executive Office & Project Management",lead:"Director of Projects",members:6,health:"On Track",progress:72,description:"Strategy, cross-functional alignment, OKRs and executive reporting.",icon:"◎"},
+  {id:2,name:"Sponsorship & Partnerships",lead:"Partnerships Director",members:8,health:"At Risk",progress:48,description:"Sponsor pipeline, proposals, negotiations and partner servicing.",icon:"◆"},
+  {id:3,name:"Marketing, PR & Communications",lead:"Marketing Director",members:10,health:"On Track",progress:67,description:"Campaigns, PR, email, paid media and brand communications.",icon:"◈"},
+  {id:4,name:"Creative & 3C Studio",lead:"Creative Director",members:12,health:"On Track",progress:64,description:"Design, video, podcasts, livestreams and content production.",icon:"✦"},
+  {id:5,name:"Operations, Venues & Logistics",lead:"Operations Director",members:11,health:"At Risk",progress:44,description:"Venues, transport, vendors, accreditation and festival logistics.",icon:"⬡"},
+  {id:6,name:"Technology & Community OS",lead:"CTO",members:7,health:"On Track",progress:78,description:"Website, registrations, dashboard, automation, data and AI tools.",icon:"⌘"},
+  {id:7,name:"Finance, Legal & Compliance",lead:"Finance Director",members:5,health:"On Track",progress:61,description:"Budgets, contracts, payments, governance and compliance.",icon:"§"},
+  {id:8,name:"Programming, Speakers & Talent",lead:"Programming Director",members:8,health:"At Risk",progress:39,description:"Agenda, speakers, performers, awards and pillar programming.",icon:"◐"},
+  {id:9,name:"Community Force & Volunteers",lead:"Community Director",members:12,health:"On Track",progress:70,description:"Interns, volunteers, ambassadors, countries and campuses.",icon:"♧"},
+  {id:10,name:"Health, Safety & Security",lead:"Director of Health & Safety",members:6,health:"Blocked",progress:25,description:"Medical, emergency response, crowd safety and security planning.",icon:"✚"}
+ ],
+ tasks:[
+  {id:1,title:"Approve international sponsor prospectus",dept:"Sponsorship & Partnerships",owner:"Partnerships Director",due:"2026-08-08",status:"Review",priority:"High",progress:85},
+  {id:2,title:"Publish August content calendar",dept:"Marketing, PR & Communications",owner:"Marketing Director",due:"2026-08-06",status:"Doing",priority:"High",progress:70},
+  {id:3,title:"Connect registration forms to dashboard",dept:"Technology & Community OS",owner:"CTO",due:"2026-08-10",status:"Doing",priority:"High",progress:55},
+  {id:4,title:"Confirm venue inspection schedule",dept:"Operations, Venues & Logistics",owner:"Operations Director",due:"2026-08-07",status:"Blocked",priority:"High",progress:35},
+  {id:5,title:"Recruit country point persons",dept:"Community Force & Volunteers",owner:"Community Director",due:"2026-08-12",status:"Doing",priority:"Medium",progress:60},
+  {id:6,title:"Draft medical and emergency framework",dept:"Health, Safety & Security",owner:"Director of Health & Safety",due:"2026-08-15",status:"Backlog",priority:"High",progress:20},
+  {id:7,title:"Review speaker application form",dept:"Programming, Speakers & Talent",owner:"Programming Director",due:"2026-08-09",status:"Review",priority:"Medium",progress:80},
+  {id:8,title:"Upload approved logo and brand assets",dept:"Creative & 3C Studio",owner:"Creative Director",due:"2026-08-05",status:"Done",priority:"Medium",progress:100}
+ ],
+ reports:[
+  {date:"2026-08-03",dept:"Technology & Community OS",reporter:"CTO",summary:"Homepage is substantially complete; authenticated dashboard architecture is being defined.",health:"On Track",blocker:"",request:"Approve Phase 1 MVP scope."},
+  {date:"2026-08-02",dept:"Sponsorship & Partnerships",reporter:"Partnerships Director",summary:"Sponsor list segmented; additional international decision-maker contacts required.",health:"At Risk",blocker:"Warm introductions are limited.",request:"Board introductions to priority technology companies."}
+ ],
+ content:[
+  {date:"2026-08-05",platform:"Instagram",title:"Disturbing AI Series: YouTube Marketing",owner:"Social Media Lead",status:"Approved",asset:""},
+  {date:"2026-08-05",platform:"WhatsApp",title:"Training reminder and Google Meet link",owner:"Community Manager",status:"Approved",asset:""},
+  {date:"2026-08-06",platform:"LinkedIn",title:"Why Africa needs a future-tech ecosystem",owner:"Thought Leadership Lead",status:"In Production",asset:""},
+  {date:"2026-08-07",platform:"TikTok",title:"Meet the 16 iFest pillars",owner:"Video Team",status:"Idea",asset:""},
+  {date:"2026-08-08",platform:"Instagram",title:"Community Force recruitment reel",owner:"Community Director",status:"Awaiting Approval",asset:""},
+  {date:"2026-08-09",platform:"X",title:"AI tools for African creators thread",owner:"Copy Lead",status:"In Production",asset:""},
+  {date:"2026-08-10",platform:"YouTube",title:"AfroFutureTech weekly intelligence briefing",owner:"3C Studio",status:"Idea",asset:""}
+ ],
+ milestones:[
+  {date:"2026-08-15",title:"Registration system live",stream:"Technology",status:"done",description:"Priority forms embedded and database capture validated."},
+  {date:"2026-08-31",title:"International sponsorship outreach wave 1",stream:"Commercial",status:"risk",description:"Prospectus, target list and executive introductions activated."},
+  {date:"2026-09-15",title:"Community Force reaches 1,200 members",stream:"Community",status:"active",description:"Nigeria-led Pan-African ambassador and volunteer network."},
+  {date:"2026-09-30",title:"Programme framework locked",stream:"Programming",status:"active",description:"Stages, pillars, learning tracks, speakers and performances mapped."},
+  {date:"2026-10-15",title:"Major suppliers and venues contracted",stream:"Operations",status:"active",description:"Production, safety, logistics and venue dependencies confirmed."},
+  {date:"2026-11-01",title:"Final campaign and ticket acceleration",stream:"Marketing",status:"active",description:"Daily countdown, creator amplification and conversion campaigns."},
+  {date:"2026-11-20",title:"Operational readiness review",stream:"Executive",status:"active",description:"Final risk review, simulations, accreditation and command structure."},
+  {date:"2026-12-04",title:"AfroFutureTech iFest opens",stream:"Festival",status:"active",description:"Africa's future-tech and culture ecosystem comes alive."}
+ ],
+ resources:[
+  {title:"Master Project Drive",type:"Google Drive",url:"#",description:"Approved documents, contracts, reports and departmental folders."},
+  {title:"Social Content Calendar",type:"Google Sheets",url:"#",description:"Daily publishing plan, asset links, captions and approvals."},
+  {title:"Leadership Meeting Room",type:"Google Meet",url:"#",description:"Recurring EXCO and leadership alignment meetings."},
+  {title:"Sponsor CRM",type:"CRM / Sheet",url:"#",description:"Prospects, owners, deal stages, next actions and values."},
+  {title:"Website & Registration Hub",type:"Website",url:"#",description:"Public registrations, applications and festival information."},
+  {title:"Brand Asset Library",type:"Canva / Drive",url:"#",description:"Templates, logos, type system, approved visuals and campaigns."}
+ ],
+ decisions:[
+  {title:"Approve Phase 1 Community OS scope",owner:"EXCO",due:"2026-08-08",impact:"Unblocks member dashboard and referral system."},
+  {title:"Approve international sponsor positioning",owner:"Advisory Board",due:"2026-08-12",impact:"Enables outreach to multinational partners."},
+  {title:"Confirm venue contracting authority",owner:"Founding Executive",due:"2026-08-07",impact:"Prevents further delay in venue negotiations."}
+ ]
+};
+let data = JSON.parse(localStorage.getItem("aftifestCommandData")||"null") || structuredClone(defaultData);
+const save=()=>localStorage.setItem("aftifestCommandData",JSON.stringify(data));
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+
+function showView(id){
+ $$(".view").forEach(v=>v.classList.toggle("active",v.id===id));
+ $$("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+ const map={overview:["Executive Overview","One source of truth for leadership and delivery teams."],departments:["Departments & People","Ownership, structure and team health."],tasks:["Tasks & Accountability","Visible priorities and delivery workflow."],reports:["Department Reports","Structured updates and escalation."],content:["Social Content Calendar","Today's posts, owners, assets and approvals."],timeline:["Road to iFest","Milestones and readiness toward December."],governance:["Governance Room","Strategic visibility for Patrons, Board and EXCO."],resources:["Resources & Links","The project's central doorway."],settings:["Workspace Settings","Configure dates, data and integrations."]};
+ $("#pageTitle").textContent=map[id][0];$("#pageSub").textContent=map[id][1];
+ document.getElementById('app').classList.remove('menu-open');
+}
+$$("#nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+
+function renderAll(){
+ renderCountdown(); renderOverview(); renderDepartments(); renderTaskFilters(); renderTasks();
+ renderReports(); renderCalendar(); renderTimeline(); renderResources(); renderDecisions(); fillSettings();
+ document.title=data.settings.workspaceName;
+}
+function renderCountdown(){
+ const start=new Date(data.settings.eventStart+"T09:00:00+01:00"), now=new Date(), diff=Math.max(0,start-now);
+ const parts=[["DAYS",Math.floor(diff/864e5)],["HOURS",Math.floor(diff/36e5)%24],["MINUTES",Math.floor(diff/6e4)%60],["SECONDS",Math.floor(diff/1000)%60]];
+ $("#countdown").innerHTML=parts.map(x=>`<div><b>${String(x[1]).padStart(2,"0")}</b><span>${x[0]}</span></div>`).join("");
+}
+setInterval(renderCountdown,1000);
+
+function readiness(){return Math.round(data.departments.reduce((a,d)=>a+d.progress,0)/Math.max(1,data.departments.length))}
+function renderOverview(){
+ const ready=readiness(), open=data.tasks.filter(t=>t.status!=="Done").length, risk=data.tasks.filter(t=>t.status==="Blocked"||t.priority==="High"&&t.progress<50).length;
+ $("#metricReadiness").textContent=ready+"%";$("#sidePercent").textContent=ready+"%";$("#sideProgress").style.width=ready+"%";
+ $("#metricTasks").textContent=open;$("#metricRisk").textContent=risk;$("#metricPosts").textContent=data.content.filter(c=>new Date(c.date)>=new Date(Date.now()-864e5)).length;
+ $("#deptHealth").innerHTML=data.departments.slice(0,6).map(d=>`<div style="margin:14px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><b>${esc(d.name)}</b><span>${d.progress}%</span></div><div class="bar" style="margin-top:7px"><i style="width:${d.progress}%"></i></div></div>`).join("");
+ const today=new Date().toISOString().slice(0,10), posts=data.content.filter(c=>c.date===today), due=data.tasks.filter(t=>t.due===today);
+ $("#todayBrief").innerHTML=`<div class="notice">${posts.length} content item(s) scheduled and ${due.length} task(s) due today.</div>`+
+ posts.map(p=>`<div class="post today"><strong>${esc(p.platform)} · ${esc(p.title)}</strong>${esc(p.owner)} · ${esc(p.status)}</div>`).join("")+
+ (posts.length?"":`<div class="empty">No posts currently scheduled for today.</div>`);
+ $("#priorityTable").innerHTML=data.tasks.filter(t=>t.priority==="High").slice(0,7).map(t=>`<tr><td><b>${esc(t.title)}</b><br/><small>${esc(t.dept)}</small></td><td>${esc(t.owner)}</td><td>${esc(t.due)}</td><td><span class="status ${t.status==="Blocked"?"off":t.status==="Done"?"on":"risk"}">${esc(t.status)}</span></td><td style="min-width:140px"><div class="bar"><i style="width:${t.progress}%"></i></div><small>${t.progress}%</small></td></tr>`).join("");
+}
+function renderDepartments(){
+ const q=($("#deptSearch")?.value||"").toLowerCase(), st=$("#deptStatus")?.value||"";
+ const arr=data.departments.filter(d=>(d.name+d.lead).toLowerCase().includes(q)&&(!st||d.health===st));
+ $("#departmentGrid").innerHTML=arr.map(d=>`<div class="card dept-card"><div class="icon">${esc(d.icon)}</div><h3>${esc(d.name)}</h3><p>${esc(d.description)}</p><div class="dept-meta"><span>Lead: <b>${esc(d.lead)}</b></span><span>${d.members} people</span></div><div class="bar"><i style="width:${d.progress}%"></i></div><div class="dept-meta"><span>${d.progress}% ready</span><span class="status ${d.health==="On Track"?"on":d.health==="Blocked"?"off":"risk"}">${esc(d.health)}</span></div></div>`).join("")||`<div class="empty">No departments match your filter.</div>`;
+}
+function renderTaskFilters(){
+ const depts=[...new Set(data.tasks.map(t=>t.dept))], owners=[...new Set(data.tasks.map(t=>t.owner))];
+ $("#taskDept").innerHTML=`<option value="">All departments</option>`+depts.map(x=>`<option>${esc(x)}</option>`).join("");
+ $("#taskOwner").innerHTML=`<option value="">All owners</option>`+owners.map(x=>`<option>${esc(x)}</option>`).join("");
+}
+function renderTasks(){
+ const q=($("#taskSearch")?.value||"").toLowerCase(), dep=$("#taskDept")?.value||"", own=$("#taskOwner")?.value||"";
+ const arr=data.tasks.filter(t=>t.title.toLowerCase().includes(q)&&(!dep||t.dept===dep)&&(!own||t.owner===own));
+ const cols=["Backlog","Doing","Review","Done"];
+ $("#kanban").innerHTML=cols.map(c=>`<div class="column"><h4>${c} <span class="tag">${arr.filter(t=>t.status===c).length}</span></h4>${arr.filter(t=>t.status===c).map(t=>`<div class="task"><b>${esc(t.title)}</b><p>${esc(t.dept)}<br/>Owner: ${esc(t.owner)}<br/>Due: ${esc(t.due)}</p><div class="task-footer"><span class="tag ${t.priority==="High"?"red":t.priority==="Medium"?"amber":""}">${esc(t.priority)}</span><span>${t.progress}%</span></div></div>`).join("")||`<div class="empty">No tasks</div>`}</div>`).join("");
+}
+function renderReports(){
+ $("#reportCount").textContent=data.reports.length;$("#reportOnTime").textContent=(data.reports.length?Math.round(data.reports.filter(r=>r.date).length/data.departments.length*100):0)+"%";
+ $("#reportBlockers").textContent=data.reports.filter(r=>r.blocker).length;$("#reportRequests").textContent=data.reports.filter(r=>r.request).length;
+ $("#reportTable").innerHTML=data.reports.slice().reverse().map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.dept)}</td><td>${esc(r.reporter)}</td><td>${esc(r.summary)}${r.blocker?`<br/><small><b>Blocker:</b> ${esc(r.blocker)}</small>`:""}${r.request?`<br/><small><b>Leadership request:</b> ${esc(r.request)}</small>`:""}</td><td><span class="status ${r.health==="On Track"?"on":r.health==="Blocked"?"off":"risk"}">${esc(r.health)}</span></td></tr>`).join("")||`<tr><td colspan="5" class="empty">No reports submitted.</td></tr>`;
+}
+function dateRange(start,days=14){return [...Array(days)].map((_,i)=>{let d=new Date(start);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10)})}
+function renderCalendar(){
+ const platform=$("#contentPlatform")?.value||"", status=$("#contentStatus")?.value||"";
+ const arr=data.content.filter(c=>(!platform||c.platform===platform)&&(!status||c.status===status));
+ const start=new Date();start.setDate(start.getDate()-start.getDay()+1);
+ $("#calendar").innerHTML=dateRange(start,14).map(d=>{const items=arr.filter(c=>c.date===d);return `<div class="day" onclick="openPost('${d}')"><div class="date">${new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</div>${items.map(p=>`<div class="post ${d===new Date().toISOString().slice(0,10)?"today":""}"><strong>${esc(p.platform)} · ${esc(p.title)}</strong>${esc(p.owner)}<br/><span class="tag">${esc(p.status)}</span>${p.asset?`<br/><a href="${esc(p.asset)}" target="_blank">Open asset ↗</a>`:""}</div>`).join("")||`<small style="color:var(--muted)">Click to schedule</small>`}</div>`}).join("");
+}
+function renderTimeline(){
+ const streams={};data.milestones.forEach(m=>{streams[m.stream]=streams[m.stream]||[];streams[m.stream].push(m)});
+ $("#workstreamReadiness").innerHTML=Object.entries(streams).map(([s,ms])=>{let pct=Math.round(ms.filter(m=>m.status==="done").length/ms.length*100);return `<div style="margin:14px 0"><div style="display:flex;justify-content:space-between"><b>${esc(s)}</b><span>${pct}%</span></div><div class="bar" style="margin-top:7px"><i style="width:${pct}%"></i></div></div>`}).join("");
+ $("#timelineList").innerHTML=data.milestones.sort((a,b)=>a.date.localeCompare(b.date)).map(m=>`<div class="milestone ${m.status}"><h4>${esc(m.title)}</h4><p>${esc(m.description)}</p><small>${esc(m.date)} · ${esc(m.stream)}</small></div>`).join("");
+}
+function renderResources(){
+ $("#resourceGrid").innerHTML=data.resources.map(r=>`<div class="card"><span class="tag">${esc(r.type)}</span><h3 style="margin-top:15px">${esc(r.title)}</h3><p style="color:var(--muted);font-size:13px">${esc(r.description)}</p><a class="btn btn-soft" style="display:inline-block;text-decoration:none" href="${esc(r.url)}" target="_blank">Open resource ↗</a></div>`).join("");
+}
+function renderDecisions(){
+ $("#decisionList").innerHTML=data.decisions.map(d=>`<div style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid #ece9f1"><div><b>${esc(d.title)}</b><p style="margin:5px 0;color:var(--muted);font-size:13px">${esc(d.impact)}</p></div><div style="text-align:right"><span class="tag amber">${esc(d.owner)}</span><small style="display:block;margin-top:6px">Due ${esc(d.due)}</small></div></div>`).join("");
+}
+function fillSettings(){ $("#eventStart").value=data.settings.eventStart;$("#eventEnd").value=data.settings.eventEnd;$("#workspaceName").value=data.settings.workspaceName}
+function saveSettings(){data.settings={eventStart:$("#eventStart").value,eventEnd:$("#eventEnd").value,workspaceName:$("#workspaceName").value};save();renderAll();alert("Settings saved.");}
+function modal(title,body){$("#modalTitle").textContent=title;$("#modalBody").innerHTML=body;$("#modal").showModal()}
+function closeModal(){$("#modal").close()}
+function openReport(){modal("Submit department report",`<form onsubmit="submitReport(event)"><label>Department</label><select name="dept" required>${data.departments.map(d=>`<option>${esc(d.name)}</option>`)}</select><label>Reporter</label><input name="reporter" required placeholder="Name or role"/><label>Overall health</label><select name="health"><option>On Track</option><option>At Risk</option><option>Blocked</option></select><label>Progress summary</label><textarea name="summary" required placeholder="What was completed? What changed?"></textarea><label>Blockers</label><textarea name="blocker" placeholder="What is preventing progress?"></textarea><label>Leadership request</label><textarea name="request" placeholder="What decision, introduction or support is needed?"></textarea><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Submit report</button></div></form>`)}
+function submitReport(e){e.preventDefault();const f=new FormData(e.target);data.reports.push({date:new Date().toISOString().slice(0,10),dept:f.get("dept"),reporter:f.get("reporter"),health:f.get("health"),summary:f.get("summary"),blocker:f.get("blocker"),request:f.get("request")});save();closeModal();renderAll()}
+function openTask(){modal("Create accountability task",`<form onsubmit="submitTask(event)"><label>Task title</label><input name="title" required/><label>Department</label><select name="dept">${data.departments.map(d=>`<option>${esc(d.name)}</option>`)}</select><label>Owner</label><input name="owner" required/><div class="grid grid-2"><div><label>Due date</label><input type="date" name="due" required/></div><div><label>Priority</label><select name="priority"><option>High</option><option>Medium</option><option>Low</option></select></div></div><label>Status</label><select name="status"><option>Backlog</option><option>Doing</option><option>Review</option><option>Done</option></select><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Create task</button></div></form>`)}
+function submitTask(e){e.preventDefault();const f=new FormData(e.target);data.tasks.push({id:Date.now(),title:f.get("title"),dept:f.get("dept"),owner:f.get("owner"),due:f.get("due"),priority:f.get("priority"),status:f.get("status"),progress:f.get("status")==="Done"?100:10});save();closeModal();renderAll()}
+function openPost(date=""){modal("Schedule social content",`<form onsubmit="submitPost(event)"><label>Publish date</label><input type="date" name="date" required value="${date}"/><label>Platform</label><select name="platform"><option>Instagram</option><option>LinkedIn</option><option>TikTok</option><option>X</option><option>YouTube</option><option>WhatsApp</option></select><label>Post / campaign title</label><input name="title" required/><label>Owner</label><input name="owner" required/><label>Status</label><select name="status"><option>Idea</option><option>In Production</option><option>Awaiting Approval</option><option>Approved</option><option>Published</option></select><label>Asset link</label><input name="asset" type="url" placeholder="Google Drive, Canva or website URL"/><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Schedule</button></div></form>`)}
+function submitPost(e){e.preventDefault();const f=new FormData(e.target);data.content.push(Object.fromEntries(f.entries()));save();closeModal();renderAll()}
+function openMilestone(){modal("Add project milestone",`<form onsubmit="submitMilestone(event)"><label>Date</label><input type="date" name="date" required/><label>Milestone</label><input name="title" required/><label>Workstream</label><input name="stream" required/><label>Description</label><textarea name="description"></textarea><label>Status</label><select name="status"><option value="active">Active</option><option value="risk">At Risk</option><option value="done">Completed</option></select><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Add milestone</button></div></form>`)}
+function submitMilestone(e){e.preventDefault();data.milestones.push(Object.fromEntries(new FormData(e.target).entries()));save();closeModal();renderAll()}
+function openDepartment(){modal("Add department",`<form onsubmit="submitDepartment(event)"><label>Department name</label><input name="name" required/><label>Lead</label><input name="lead" required/><label>Description</label><textarea name="description"></textarea><div class="grid grid-2"><div><label>Team size</label><input name="members" type="number" value="1"/></div><div><label>Readiness %</label><input name="progress" type="number" min="0" max="100" value="10"/></div></div><label>Health</label><select name="health"><option>On Track</option><option>At Risk</option><option>Blocked</option></select><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Add department</button></div></form>`)}
+function submitDepartment(e){e.preventDefault();const o=Object.fromEntries(new FormData(e.target).entries());data.departments.push({...o,id:Date.now(),members:+o.members,progress:+o.progress,icon:"◉"});save();closeModal();renderAll()}
+function openResource(){modal("Add resource",`<form onsubmit="submitResource(event)"><label>Resource title</label><input name="title" required/><label>Type</label><input name="type" placeholder="Google Drive, Sheet, Meet, Website…"/><label>URL</label><input name="url" type="url" required/><label>Description</label><textarea name="description"></textarea><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Add resource</button></div></form>`)}
+function submitResource(e){e.preventDefault();data.resources.push(Object.fromEntries(new FormData(e.target).entries()));save();closeModal();renderAll()}
+function download(name,text,type="application/json"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportWorkspace(){download("aftifest-command-center-backup.json",JSON.stringify(data,null,2))}
+function importWorkspace(e){const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();renderAll();alert("Workspace imported.")}catch{alert("Invalid JSON file.")}};r.readAsText(e.target.files[0])}
+function resetWorkspace(){if(confirm("Reset all prototype changes?")){data=structuredClone(defaultData);save();renderAll()}}
+function exportContentCSV(){const rows=[["Date","Platform","Title","Owner","Status","Asset"],...data.content.map(c=>[c.date,c.platform,c.title,c.owner,c.status,c.asset])];download("aftifest-social-content-calendar.csv",rows.map(r=>r.map(v=>`"${String(v||"").replaceAll('"','""')}"`).join(",")).join("\n"),"text/csv")}
+$("#roleSwitch").onchange=e=>alert(`Role preview switched to ${e.target.value}. In production, this will control permissions and visible modules.`);
+renderAll();
+</script>
+</body></html>
