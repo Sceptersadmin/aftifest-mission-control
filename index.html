@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFTiFest Project Command Center</title>
+<title>AfroFutureTech Mission Control v2.2</title>
 <meta name="description" content="Interactive accountability, reporting, content calendar and timeline dashboard for AfroFutureTech iFest."/>
 <style>
   :root{
@@ -73,7 +73,7 @@
 <aside>
   <div class="brand">
     <div class="mark">iF</div>
-    <div><b>AFTiFest Command Center</b><small>Alignment • Accountability • Action</small></div>
+    <div><b>AFTiFest Mission Control</b><small>v2.2 • Alignment • Accountability • Action</small></div>
   </div>
   <nav id="nav">
     <button class="active" data-view="overview">◫ Executive Overview</button>
@@ -81,10 +81,11 @@
     <button data-view="tasks">✓ Tasks & Accountability</button>
     <button data-view="reports">▤ Department Reports</button>
     <button data-view="content">▦ Social Content Calendar</button>
+    <button data-view="sponsors">◆ Sponsor CRM</button>
     <button data-view="timeline">↗ Road to iFest</button>
     <button data-view="governance">♛ Governance Room</button>
     <button data-view="resources">⬡ Resources & Links</button>
-    <button data-view="settings">⚙ Workspace Settings</button>
+    <button data-view="settings" data-admin-only="true">⚙ Workspace Settings</button>
   </nav>
   <div class="side-card">
     <strong>Festival readiness</strong>
@@ -102,7 +103,7 @@
   </div>
   <div class="header-actions">
     <select id="roleSwitch" class="role-switch" title="Preview role">
-      <option>Executive</option><option>Advisory Board</option><option>Patron</option><option>Department Lead</option><option>Team Member</option>
+      <option selected>Super Admin</option><option>Executive</option><option>Advisory Board</option><option>Patron</option><option>Department Lead</option><option>Team Member</option>
     </select>
     <button class="btn btn-primary hide-mobile" onclick="openReport()">+ Submit report</button>
     <div class="avatar">JO</div>
@@ -111,7 +112,7 @@
 
 <section id="overview" class="view active">
   <div class="hero">
-    <div class="eyebrow">AfroFutureTech iFest 2026 • Project Intelligence Layer</div>
+    <div class="eyebrow">AfroFutureTech iFest 2026 • Mission Control v2.2</div>
     <h2>Everyone aligned.<br/>Every task visible.</h2>
     <p>A shared operational interface for Patrons, Advisory Board, EXCO, department leads and execution teams—connecting strategy, reporting, social content, milestones and accountability.</p>
     <div class="hero-actions">
@@ -176,6 +177,19 @@
   <div class="calendar" id="calendar" style="margin-top:16px"></div>
 </section>
 
+
+<section id="sponsors" class="view">
+  <div class="section-title"><div><h2>Sponsor CRM</h2><p>Track prospects, values, owners, next actions and deal health.</p></div><button class="btn btn-primary" onclick="openSponsor()">+ Add sponsor</button></div>
+  <div class="grid grid-4">
+    <div class="card metric"><strong id="sponsorPipeline">$0</strong><p>Total pipeline value</p></div>
+    <div class="card metric"><strong id="sponsorActive">0</strong><p>Active opportunities</p></div>
+    <div class="card metric"><strong id="sponsorMeetings">0</strong><p>Meetings scheduled</p></div>
+    <div class="card metric"><strong id="sponsorWon">0</strong><p>Confirmed partners</p></div>
+  </div>
+  <div class="section-title"><div><h2>Partnership pipeline</h2></div></div>
+  <div class="card" style="overflow:auto"><table><thead><tr><th>Organization</th><th>Category</th><th>Owner</th><th>Stage</th><th>Value</th><th>Next Action</th></tr></thead><tbody id="sponsorTable"></tbody></table></div>
+</section>
+
 <section id="timeline" class="view">
   <div class="section-title"><div><h2>Road to iFest</h2><p>Milestones counting down to 4–6 December 2026. Event dates are editable in Settings.</p></div><button class="btn btn-primary" onclick="openMilestone()">+ Add milestone</button></div>
   <div class="grid grid-2">
@@ -215,7 +229,7 @@
     </div>
     <div class="card">
       <h3>Data controls</h3>
-      <p style="color:var(--muted)">This prototype stores edits in the current browser using localStorage. For multi-user collaboration, connect it to Firebase, Supabase, WordPress REST API or your existing application backend.</p>
+      <div class="notice" style="margin-bottom:14px"><b>Admin-only prototype view:</b> This menu is hidden from every role except Super Admin. Real security will require backend authentication and server-side permission checks.</div><p style="color:var(--muted)">This prototype stores edits in the current browser using localStorage. For multi-user collaboration, connect it to Firebase, Supabase, WordPress REST API or your existing application backend.</p>
       <button class="btn btn-soft" onclick="exportWorkspace()">Export JSON backup</button>
       <button class="btn btn-soft" onclick="document.getElementById('importFile').click()">Import JSON</button>
       <input id="importFile" type="file" accept=".json" hidden onchange="importWorkspace(event)"/>
@@ -284,6 +298,13 @@ const defaultData = {
   {title:"Website & Registration Hub",type:"Website",url:"#",description:"Public registrations, applications and festival information."},
   {title:"Brand Asset Library",type:"Canva / Drive",url:"#",description:"Templates, logos, type system, approved visuals and campaigns."}
  ],
+ sponsors:[
+  {organization:"Global AI Partner",category:"Artificial Intelligence",owner:"Partnerships Director",stage:"Prospecting",value:250000,nextAction:"Request executive introduction",meeting:false},
+  {organization:"Pan-African Telecom Partner",category:"Telecommunications",owner:"Commercial Lead",stage:"Meeting Scheduled",value:500000,nextAction:"Present pillar activation options",meeting:true},
+  {organization:"Digital Payments Partner",category:"Fintech",owner:"Partnerships Manager",stage:"Proposal Sent",value:150000,nextAction:"Follow up on proposal",meeting:false},
+  {organization:"Cloud & Developer Partner",category:"Cloud Technology",owner:"Technology Partnerships",stage:"Negotiation",value:300000,nextAction:"Finalize developer ecosystem benefits",meeting:true},
+  {organization:"Media Distribution Partner",category:"Media",owner:"PR Director",stage:"Confirmed",value:75000,nextAction:"Begin joint announcement plan",meeting:false}
+ ],
  decisions:[
   {title:"Approve Phase 1 Community OS scope",owner:"EXCO",due:"2026-08-08",impact:"Unblocks member dashboard and referral system."},
   {title:"Approve international sponsor positioning",owner:"Advisory Board",due:"2026-08-12",impact:"Enables outreach to multinational partners."},
@@ -304,9 +325,17 @@ function showView(id){
 }
 $$("#nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
 
+
+function applyRoleVisibility(){
+ const role=$("#roleSwitch").value;
+ const isAdmin=role==="Super Admin";
+ $$("[data-admin-only='true']").forEach(el=>el.style.display=isAdmin?"flex":"none");
+ if(!isAdmin && $("#settings").classList.contains("active")) showView("overview");
+}
+
 function renderAll(){
  renderCountdown(); renderOverview(); renderDepartments(); renderTaskFilters(); renderTasks();
- renderReports(); renderCalendar(); renderTimeline(); renderResources(); renderDecisions(); fillSettings();
+ renderReports(); renderCalendar(); renderSponsors(); renderTimeline(); renderResources(); renderDecisions(); fillSettings(); applyRoleVisibility();
  document.title=data.settings.workspaceName;
 }
 function renderCountdown(){
@@ -356,6 +385,19 @@ function renderCalendar(){
  const start=new Date();start.setDate(start.getDate()-start.getDay()+1);
  $("#calendar").innerHTML=dateRange(start,14).map(d=>{const items=arr.filter(c=>c.date===d);return `<div class="day" onclick="openPost('${d}')"><div class="date">${new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</div>${items.map(p=>`<div class="post ${d===new Date().toISOString().slice(0,10)?"today":""}"><strong>${esc(p.platform)} · ${esc(p.title)}</strong>${esc(p.owner)}<br/><span class="tag">${esc(p.status)}</span>${p.asset?`<br/><a href="${esc(p.asset)}" target="_blank">Open asset ↗</a>`:""}</div>`).join("")||`<small style="color:var(--muted)">Click to schedule</small>`}</div>`}).join("");
 }
+
+function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n||0)}
+function renderSponsors(){
+ const s=data.sponsors||[];
+ $("#sponsorPipeline").textContent=money(s.reduce((a,x)=>a+(+x.value||0),0));
+ $("#sponsorActive").textContent=s.filter(x=>x.stage!=="Confirmed"&&x.stage!=="Declined").length;
+ $("#sponsorMeetings").textContent=s.filter(x=>x.meeting).length;
+ $("#sponsorWon").textContent=s.filter(x=>x.stage==="Confirmed").length;
+ $("#sponsorTable").innerHTML=s.map(x=>`<tr><td><b>${esc(x.organization)}</b></td><td>${esc(x.category)}</td><td>${esc(x.owner)}</td><td><span class="status ${x.stage==="Confirmed"?"on":x.stage==="Negotiation"?"risk":""}">${esc(x.stage)}</span></td><td>${money(x.value)}</td><td>${esc(x.nextAction)}</td></tr>`).join("")||`<tr><td colspan="6" class="empty">No sponsor opportunities yet.</td></tr>`;
+}
+function openSponsor(){modal("Add sponsor opportunity",`<form onsubmit="submitSponsor(event)"><label>Organization</label><input name="organization" required/><label>Category</label><input name="category" required/><label>Owner</label><input name="owner" required/><label>Stage</label><select name="stage"><option>Prospecting</option><option>Meeting Scheduled</option><option>Proposal Sent</option><option>Negotiation</option><option>Confirmed</option><option>Declined</option></select><label>Potential value (USD)</label><input name="value" type="number" min="0"/><label>Next action</label><textarea name="nextAction"></textarea><label><input name="meeting" type="checkbox" style="width:auto"/> Meeting scheduled</label><div class="modal-actions"><button type="button" class="btn btn-soft" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Add opportunity</button></div></form>`)}
+function submitSponsor(e){e.preventDefault();const f=new FormData(e.target);data.sponsors=data.sponsors||[];data.sponsors.push({organization:f.get("organization"),category:f.get("category"),owner:f.get("owner"),stage:f.get("stage"),value:+f.get("value")||0,nextAction:f.get("nextAction"),meeting:f.get("meeting")==="on"});save();closeModal();renderAll()}
+
 function renderTimeline(){
  const streams={};data.milestones.forEach(m=>{streams[m.stream]=streams[m.stream]||[];streams[m.stream].push(m)});
  $("#workstreamReadiness").innerHTML=Object.entries(streams).map(([s,ms])=>{let pct=Math.round(ms.filter(m=>m.status==="done").length/ms.length*100);return `<div style="margin:14px 0"><div style="display:flex;justify-content:space-between"><b>${esc(s)}</b><span>${pct}%</span></div><div class="bar" style="margin-top:7px"><i style="width:${pct}%"></i></div></div>`}).join("");
@@ -388,7 +430,10 @@ function exportWorkspace(){download("aftifest-command-center-backup.json",JSON.s
 function importWorkspace(e){const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();renderAll();alert("Workspace imported.")}catch{alert("Invalid JSON file.")}};r.readAsText(e.target.files[0])}
 function resetWorkspace(){if(confirm("Reset all prototype changes?")){data=structuredClone(defaultData);save();renderAll()}}
 function exportContentCSV(){const rows=[["Date","Platform","Title","Owner","Status","Asset"],...data.content.map(c=>[c.date,c.platform,c.title,c.owner,c.status,c.asset])];download("aftifest-social-content-calendar.csv",rows.map(r=>r.map(v=>`"${String(v||"").replaceAll('"','""')}"`).join(",")).join("\n"),"text/csv")}
-$("#roleSwitch").onchange=e=>alert(`Role preview switched to ${e.target.value}. In production, this will control permissions and visible modules.`);
+$("#roleSwitch").onchange=e=>{
+ applyRoleVisibility();
+ alert(`Role preview switched to ${e.target.value}. Workspace Settings is visible only to Super Admin in this prototype.`);
+};
 renderAll();
 </script>
 </body></html>
