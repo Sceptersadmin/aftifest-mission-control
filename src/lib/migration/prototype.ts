@@ -30,10 +30,14 @@ export function previewPrototypeMigration(raw: string): MigrationPreview {
     "Event dates require reconciliation.", "Festival pillar count requires reconciliation.",
     "Departments, leads, sponsor relationships, values, resource URLs, deadlines, approval authorities, and readiness methodology are unapproved.",
   ];
+  const counts: Record<string, number> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (Array.isArray(value)) counts[key] = value.length;
+  }
   return {
     digest: createHash("sha256").update(raw).digest("hex"),
     classification: "SAMPLE / UNAPPROVED",
-    counts: Object.fromEntries(Object.entries(data).filter(([, value]) => Array.isArray(value)).map(([key, value]) => [key, value.length])),
+    counts,
     warnings,
     data,
   };
