@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:provision": "node scripts/provision-e2e.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:foundation": "node scripts/validate-foundation.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm check:foundation && pnpm check:secrets && pnpm build"
