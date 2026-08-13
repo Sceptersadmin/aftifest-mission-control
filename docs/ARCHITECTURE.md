@@ -1,5 +1,9 @@
 # Phase 1 Architecture
 
+## Sensitivity enforcement
+
+Phase 1.7 adds record-level visibility and department scope beneath capability checks. The browser and server UI are convenience layers only; PostgreSQL RLS remains authoritative. Private Storage resolves each object to governed attachment metadata and applies the same sensitivity helper. ASK iFEST uses the requester's cookie-backed Supabase client and never a service-role client, so its sources and citations are filtered by the same RLS policies.
+
 ## Components
 
 - **Next.js application:** authenticated shell, server-rendered views, route handlers, and server actions.

@@ -1,5 +1,9 @@
 # Agent Authority and ASK iFEST
 
+## Requester-effective retrieval
+
+ASK iFEST remains Level 0. Its API authenticates the requester, resolves active organization membership and `brain.read`, then queries Company Brain with that same requester session. Restricted, confidential, department, and cross-organization records remain invisible unless the human requester has the exact underlying capability and scope. Citations are constructed only from rows returned through RLS. No service-role credential is used in the request path.
+
 ## Authority levels
 
 - **Level 0 — Read Only:** retrieve and synthesize authorized information.

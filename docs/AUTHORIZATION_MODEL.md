@@ -1,5 +1,11 @@
 # Authorization Model
 
+## Phase 1.7 record sensitivity
+
+Authorization is the intersection of active organization membership, an explicit capability, and record scope. `public` means intentionally broad inside the authenticated Mission Control boundary; `organization` means active same-organization members with the base capability; `department` additionally requires membership in the assigned department (or explicit `department.read_all`); `restricted` requires a dedicated restricted capability; and `confidential` requires a separate confidential capability. Missing organization, visibility, department assignment, classification, membership, or capability fails closed.
+
+Reusable `SECURITY DEFINER` helpers centralize these rules: `is_org_member`, `has_permission`, `is_department_member`, `can_access_sensitive_record`, and `can_access_attachment`. They use fixed `public, pg_temp` search paths, expose execution only to `authenticated`, accept no caller-supplied SQL, and return booleans rather than data. Their purpose is consistent RLS evaluation, not bypassing RLS.
+
 ## Principle
 
 Authentication identifies a user. Organization membership establishes scope. Roles grant capabilities. Row-Level Security enforces data access at the database layer. Server-side capability checks protect workflows and administrative operations.
