@@ -10,6 +10,8 @@ All prototype defaults and development fixtures are **SAMPLE / UNAPPROVED** unti
 | Sponsor relationships | Organizations are generic samples and must not be represented as confirmed real partners. | Approve real prospects, relationship stage, owners, and disclosure level. |
 | Financial values | Sponsor pipeline values are illustrative USD amounts. | Approve currency, access restrictions, and verified values. |
 | Approval authorities | Prototype decisions name EXCO, Advisory Board, and Founding Executive without an approved authority matrix. | Configure approval rules and eligible roles. |
+| Decision lifecycle and approval policy | Phase 2C supplies a configurable technical lifecycle, ordered steps, self-approval control, and four descriptive authority grades. These are not approved AFTiFest policy. | Approve lifecycle transitions, eligible capabilities/roles, minimum counts, delegation policy, reopening rules, and authority-grade usage. |
+| Financial governance | Approval rules can store a structural threshold, but no currency, amount, or authority limit is configured. | Approve financial governance separately before any value is entered or enforced. |
 | Resource URLs | Default links are `#` placeholders. | Supply approved internal URLs and visibility classifications. |
 | Deadlines | Seeded August 2026 deadlines may be outdated. | Review and approve current deadlines. |
 | Readiness | Readiness is an unweighted average of department progress. | Define evidence, weights, owners, thresholds, and calculation governance. |

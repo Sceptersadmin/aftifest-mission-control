@@ -8,10 +8,10 @@ test("unauthenticated users are redirected to the branded login boundary",async(
   await expect(page.getByText("Self-registration is disabled.")).toBeVisible();
 });
 
-test("health endpoint confirms local-only Phase 2B runtime",async({request})=>{
+test("health endpoint confirms local-only Phase 2C runtime",async({request})=>{
   const response=await request.get("/api/health");
   expect(response.status()).toBe(200);
-  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2B",productionInfrastructure:false});
+  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2C",productionInfrastructure:false});
 });
 
 test("ASK iFEST fails closed without authenticated permissions",async({request})=>{
@@ -83,4 +83,17 @@ test("Phase 2B TEST administrator can use PostgreSQL-backed operational modules"
   await page.getByRole("link",{name:/Department Reports/}).click();
   await expect(page.getByRole("heading",{name:"Signals leadership can trust."})).toBeVisible();
   await expect(page.getByRole("button",{name:"Submit report"})).toBeVisible();
+});
+
+test("Phase 2C TEST administrator can use the governed Decision Center",async({page})=>{
+  test.setTimeout(90_000);
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("phase2a-admin@test.invalid");
+  await page.getByLabel("Password").fill("TEST-Only-Password-123!");
+  await page.getByRole("button",{name:"Sign in"}).click();
+  await page.goto("/decision-center");
+  await expect(page.getByRole("heading",{name:"Governance with evidence."})).toBeVisible();
+  await page.getByPlaceholder("Decision title").fill("Playwright governance decision - TEST / SAMPLE");
+  await page.getByRole("button",{name:"Create draft"}).click();
+  await expect(page.getByText("Playwright governance decision - TEST / SAMPLE")).toBeVisible();
 });

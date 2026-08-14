@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
 
 export function GET() {
-  return NextResponse.json({ status: "ok", phase: "2B", productionInfrastructure: false });
+  return NextResponse.json({ status: "ok", phase: "2C", productionInfrastructure: false });
 }

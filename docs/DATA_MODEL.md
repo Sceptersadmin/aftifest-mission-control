@@ -14,7 +14,7 @@
 
 ## Decisions and approvals
 
-`decisions` capture requester, owner, due date, impact, context, status, and outcome. `approval_rules` define configurable authority requirements. `approvals` are ordered steps tied to decisions or other supported targets. No seeded individual is treated as an approved authority.
+`decisions` capture requester, owner, department, type, due date, impact, context, sensitivity, human-authority grade, lifecycle, and outcome. `approval_rules` define configurable organization/department/type/sensitivity criteria without granting authority by title. `approval_rule_steps` provide ordered capability/role eligibility and minimum counts; `approvals` materialize those steps; immutable `approval_votes` preserve attributable responses and rationale. No seeded individual is treated as an approved authority.
 
 ## Audit, agents, and knowledge
 

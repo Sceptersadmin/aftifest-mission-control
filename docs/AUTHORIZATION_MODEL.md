@@ -23,9 +23,11 @@ Future roles such as Volunteer, Sponsor, Vendor, Speaker, and External Collabora
 
 ## Permission examples
 
-`workspace.admin`, `department.read`, `department.manage`, `task.read`, `task.manage_assigned`, `task.manage_department`, `report.submit`, `report.review`, `content.read`, `content.manage`, `sponsor.read`, `sponsor.manage`, `decision.read`, `decision.propose`, `decision.approve`, `governance.read_restricted`, `brain.read`, `brain.manage`, `agent.read`, and `agent.configure`.
+`workspace.admin`, `department.read`, `department.manage`, `task.read`, `task.manage_assigned`, `task.manage_department`, `report.submit`, `report.review`, `content.read`, `content.manage`, `sponsor.read`, `sponsor.manage`, `decision.read`, `decision.propose`, `decision.transition`, `decision.approve`, `decision.manage_rules`, `governance.read_restricted`, `governance.read_confidential`, `brain.read`, `brain.manage`, `agent.read`, and `agent.configure`.
 
 No role name automatically confers approval authority. Approval requirements and eligible roles are configured in approval rules and steps.
+
+Phase 2C decision transitions and approval responses execute through fixed-search-path database functions. The functions re-evaluate active membership, record sensitivity, explicit capabilities, eligible role constraints, ordered-step state, self-approval policy, duplicate evidence, and terminal state. Ordinary clients cannot directly mutate decisions, approval steps, immutable votes, or historical audit evidence.
 
 ## Enforcement
 
