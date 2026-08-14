@@ -8,10 +8,10 @@ test("unauthenticated users are redirected to the branded login boundary",async(
   await expect(page.getByText("Self-registration is disabled.")).toBeVisible();
 });
 
-test("health endpoint confirms local-only Phase 2C runtime",async({request})=>{
+test("health endpoint confirms local-only Phase 2D runtime",async({request})=>{
   const response=await request.get("/api/health");
   expect(response.status()).toBe(200);
-  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2C",productionInfrastructure:false});
+  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2D",productionInfrastructure:false});
 });
 
 test("ASK iFEST fails closed without authenticated permissions",async({request})=>{
@@ -30,6 +30,7 @@ test("authenticated TEST member gets role-aware shell and requester-effective AS
   await expect(page.getByRole("link",{name:/Company Brain/})).toBeVisible();
   await expect(page.getByRole("link",{name:/Agent Registry/})).toBeVisible();
   await expect(page.getByRole("link",{name:/Decision Center|Governance Room/})).toHaveCount(0);
+  await expect(page.getByRole("link",{name:/Controlled Import/})).toHaveCount(0);
 
   const denied=await page.goto("/decision-center");
   expect(denied?.status()).toBe(200);
@@ -96,4 +97,14 @@ test("Phase 2C TEST administrator can use the governed Decision Center",async({p
   await page.getByPlaceholder("Decision title").fill("Playwright governance decision - TEST / SAMPLE");
   await page.getByRole("button",{name:"Create draft"}).click();
   await expect(page.getByText("Playwright governance decision - TEST / SAMPLE")).toBeVisible();
+});
+
+test("Phase 2D TEST administrator previews and executes a controlled import",async({page})=>{
+  test.setTimeout(120_000);
+  await page.goto("/login");await page.getByLabel("Email").fill("phase2a-admin@test.invalid");await page.getByLabel("Password").fill("TEST-Only-Password-123!");await page.getByRole("button",{name:"Sign in"}).click();
+  await page.getByRole("link",{name:/Controlled Import/}).click();await expect(page.getByRole("heading",{name:"Preview first. Reconcile always."})).toBeVisible();
+  const fixture={settings:{workspaceName:"E2E TEST / SAMPLE",eventStart:"2026-12-04",eventEnd:"2026-12-06"},departments:[{id:1,name:"Imported E2E Department",lead:"UNMAPPED TEST Lead",progress:99}],tasks:[],reports:[],content:[],milestones:[],resources:[],sponsors:[],decisions:[]};
+  await page.locator('input[type="file"]').setInputFiles({name:"e2e-prototype.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(fixture))});await page.getByRole("button",{name:"Validate and create preview"}).click();
+  await expect(page.getByRole("heading",{name:"Preview: e2e-prototype.json"})).toBeVisible();await expect(page.getByText("UNMAPPED TEST Lead")).toBeVisible();await page.getByRole("button",{name:"Confirm transactional import"}).click();await expect(page.getByText("completed",{exact:true}).first()).toBeVisible();
+  await page.goto("/departments");await expect(page.getByText("Imported E2E Department")).toBeVisible();
 });

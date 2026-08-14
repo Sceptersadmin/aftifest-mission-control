@@ -29,6 +29,8 @@ No role name automatically confers approval authority. Approval requirements and
 
 Phase 2C decision transitions and approval responses execute through fixed-search-path database functions. The functions re-evaluate active membership, record sensitivity, explicit capabilities, eligible role constraints, ordered-step state, self-approval policy, duplicate evidence, and terminal state. Ordinary clients cannot directly mutate decisions, approval steps, immutable votes, or historical audit evidence.
 
+Phase 2D import preview, reconciliation, person mapping, and execution require explicit `import.manage` or `import.execute` capabilities. Browser clients receive no service-role access and cannot directly rewrite batches, items, mappings, or completed history. Trusted functions re-check active organization membership and target scope; source digests are recomputed in PostgreSQL.
+
 ## Enforcement
 
 Every internal table includes `organization_id`. Policies require active organization membership and, where relevant, department membership or explicit capability. Sensitive governance, sponsor, Company Brain, agent, and audit records carry visibility/classification fields and receive stricter policies.

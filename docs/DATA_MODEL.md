@@ -19,3 +19,7 @@
 ## Audit, agents, and knowledge
 
 `audit_events` records actor type and identity, action, target, before/after state, approval, and source context. `agents` stores authority level and policy; `agent_runs` stores initiator, mode, request, response, citations, policy result, and audit linkage. `company_brain_items` stores governed knowledge metadata and provenance. `notifications` is an in-app foundation only.
+
+## Controlled data transition
+
+`import_batches` protects source filename, canonical SHA-256 digest, schema version, preview, warnings, lifecycle, counts, uploader, confirmation, completion, and rollback evidence. `import_items` stores deterministic source keys, original payloads, target types, mappings, exclusions, deferrals, and imported target IDs. `import_person_mappings` can link a prototype name only to an explicitly selected active organization member; it never creates Auth identities or leadership authority. Imported target rows retain batch, source key, digest-backed provenance, original payload, importer, timestamp, and `SAMPLE / UNAPPROVED` verification state.
