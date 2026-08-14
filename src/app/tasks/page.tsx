@@ -1,0 +1,18 @@
+import {addTaskComment,assignTask,createTask,updateTask} from "@/app/operational/actions";
+import {MissionControlShell} from "@/components/mission-control-shell";
+import {requireOrganizationPermission} from "@/lib/auth/session";
+import {createClient} from "@/lib/supabase/server";
+
+const lanes=["backlog","planned","in_progress","blocked","completed"];
+function departmentName(value:unknown){const item=Array.isArray(value)?value[0]:value;if(!item||typeof item!=="object")return "Unassigned";if("name" in item&&item.name)return String(item.name);if("display_name" in item&&item.display_name)return String(item.display_name);if("email" in item)return String(item.email);return "TEST Member"}
+
+export default async function Tasks(){
+ const {organizationId}=await requireOrganizationPermission("task.read");const s=await createClient();
+ const [{data:tasks},{data:departments},{data:members}]=await Promise.all([
+  s.from("tasks").select("id,title,description,status,priority,progress,due_at,department_id,visibility,departments(name),task_assignees(organization_members(profiles(display_name)))").eq("organization_id",organizationId).order("created_at"),
+  s.from("departments").select("id,name").eq("organization_id",organizationId).eq("status","active"),
+  s.from("organization_members").select("id,profiles(display_name,email)").eq("organization_id",organizationId).eq("status","active")]);
+ return <MissionControlShell active="Tasks & Accountability"><section className="hero"><span className="eyebrow">KANBAN · POSTGRESQL · AUDITED</span><h1>Accountability in motion.</h1><p>Assigned-user and department authority are enforced by RLS. AI ownership is structural only; no autonomous execution is enabled.</p></section>
+ <article className="card opsComposer"><form action={createTask} className="opsForm row"><input name="title" placeholder="Task title" required/><select name="department_id" required><option value="">Department</option>{departments?.map(d=><option value={d.id} key={d.id}>{d.name}</option>)}</select><select name="priority"><option>low</option><option>medium</option><option>high</option><option>critical</option></select><input name="due_at" type="datetime-local"/><button>Create task</button></form></article>
+ <div className="kanban">{lanes.map(lane=><section className="lane" key={lane}><h3>{lane.replace("_"," ")}</h3>{tasks?.filter(t=>t.status===lane).map(t=><article className="taskCard" key={t.id}><span className={`tag ${t.priority==="critical"?"amber":""}`}>{t.priority}</span><h4>{t.title}</h4><p>{departmentName(t.departments)}</p><div className="bar"><i style={{width:`${t.progress}%`}}/></div><form action={updateTask} className="opsForm"><input type="hidden" name="id" value={t.id}/><select name="status" defaultValue={t.status}>{[...lanes,"archived"].map(x=><option key={x}>{x}</option>)}</select><select name="priority" defaultValue={t.priority}><option>low</option><option>medium</option><option>high</option><option>critical</option></select><input name="progress" type="number" min="0" max="100" defaultValue={t.progress}/><button>Save</button></form><form action={assignTask} className="opsForm"><input type="hidden" name="task_id" value={t.id}/><select name="organization_member_id" required><option value="">Assign accountable person</option>{members?.map(m=><option key={m.id} value={m.id}>{departmentName(m.profiles)}</option>)}</select><button>Assign</button></form><form action={addTaskComment} className="opsForm"><input type="hidden" name="task_id" value={t.id}/><input name="body" placeholder="Add governed comment" required/><button>Comment</button></form></article>)}</section>)}</div></MissionControlShell>
+}

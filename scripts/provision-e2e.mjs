@@ -13,6 +13,8 @@ const roleId = "81000000-0000-4000-8000-000000000002";
 const authorizedSourceId = "81000000-0000-4000-8000-000000000003";
 const restrictedSourceId = "81000000-0000-4000-8000-000000000004";
 const adminRoleId = "81000000-0000-4000-8000-000000000005";
+const departmentId = "81000000-0000-4000-8000-000000000006";
+const reportPeriodId = "81000000-0000-4000-8000-000000000007";
 
 function dockerCommand() {
   if (process.platform !== "win32") return "docker";
@@ -86,8 +88,16 @@ export async function provisionE2E() {
       select '${roleId}',id from public.permissions where key in ('department.read','task.read','report.submit','content.read','resource.read','brain.read','agent.read')
       on conflict do nothing;
     insert into public.role_permissions(role_id,permission_id)
-      select '${adminRoleId}',id from public.permissions where key in ('workspace.admin','organization.manage','user.provision','membership.manage','role.manage','audit.read','audit.read_restricted')
+      select '${adminRoleId}',id from public.permissions where key in ('workspace.admin','organization.manage','user.provision','membership.manage','role.manage','audit.read','audit.read_restricted','department.read','department.read_all','department.manage','department.people_read','task.read','task.manage_department','task.manage_assigned','task.assign','task.comment','report.submit','report.review')
       on conflict do nothing;
+    insert into public.departments(id,organization_id,name,description,health,readiness,verification_status,metadata) values
+      ('${departmentId}','${organizationId}','Phase 2B Operations - TEST / SAMPLE','TEST / SAMPLE / UNAPPROVED','Unassessed',0,'sample_unapproved','{"classification":"TEST / SAMPLE / UNAPPROVED"}')
+      on conflict(id) do update set name=excluded.name,description=excluded.description;
+    insert into public.department_members(department_id,organization_member_id,title,is_lead)
+      select '${departmentId}',id,'TEST Member',false from public.organization_members where organization_id='${organizationId}' and profile_id in ('${user.id}','${adminUser.id}') on conflict do nothing;
+    insert into public.report_periods(id,organization_id,label,starts_at,ends_at,due_at,status) values
+      ('${reportPeriodId}','${organizationId}','Phase 2B TEST Reporting Period',now()-interval '1 day',now()+interval '1 day',now()+interval '2 days','active')
+      on conflict(id) do update set label=excluded.label;
     insert into public.company_brain_items(id,organization_id,title,summary,source_type,source_reference,classification,visibility,verification_status) values
       ('${authorizedSourceId}','${organizationId}','Authorized TEST source','TEST / SAMPLE organization source','test','TEST / SAMPLE','internal','organization','verified'),
       ('${restrictedSourceId}','${organizationId}','Restricted TEST source','MUST NOT LEAK','test','TEST / SAMPLE','restricted','restricted','verified')

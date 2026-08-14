@@ -8,10 +8,10 @@ test("unauthenticated users are redirected to the branded login boundary",async(
   await expect(page.getByText("Self-registration is disabled.")).toBeVisible();
 });
 
-test("health endpoint confirms local-only Phase 2A runtime",async({request})=>{
+test("health endpoint confirms local-only Phase 2B runtime",async({request})=>{
   const response=await request.get("/api/health");
   expect(response.status()).toBe(200);
-  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2A",productionInfrastructure:false});
+  await expect(response.json()).resolves.toEqual({status:"ok",phase:"2B",productionInfrastructure:false});
 });
 
 test("ASK iFEST fails closed without authenticated permissions",async({request})=>{
@@ -61,4 +61,26 @@ test("Phase 2A TEST administrator can use the governed administration workspace"
   await page.getByLabel("TEST email").fill("playwright-provisioned@test.invalid");
   await page.getByRole("button",{name:"Create provisioning request"}).click();
   await expect(page.getByText("playwright-provisioned@test.invalid")).toBeVisible();
+});
+
+test("Phase 2B TEST administrator can use PostgreSQL-backed operational modules",async({page})=>{
+  test.setTimeout(90_000);
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("phase2a-admin@test.invalid");
+  await page.getByLabel("Password").fill("TEST-Only-Password-123!");
+  await page.getByRole("button",{name:"Sign in"}).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.getByText("Operational Readiness — PROVISIONAL")).toBeVisible();
+  await page.getByRole("link",{name:/Departments & People/}).click();
+  await expect(page.getByRole("heading",{name:"Departments aligned. People scoped."})).toBeVisible();
+  await expect(page.getByText("Phase 2B Operations - TEST / SAMPLE")).toBeVisible();
+  await page.getByRole("link",{name:/Tasks & Accountability/}).click();
+  await expect(page.getByRole("heading",{name:"Accountability in motion."})).toBeVisible();
+  await page.getByPlaceholder("Task title").fill("Phase 2B Playwright Task - TEST / SAMPLE");
+  await page.locator('select[name="department_id"]').selectOption({label:"Phase 2B Operations - TEST / SAMPLE"});
+  await page.getByRole("button",{name:"Create task"}).click();
+  await expect(page.getByText("Phase 2B Playwright Task - TEST / SAMPLE").first()).toBeVisible();
+  await page.getByRole("link",{name:/Department Reports/}).click();
+  await expect(page.getByRole("heading",{name:"Signals leadership can trust."})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Submit report"})).toBeVisible();
 });

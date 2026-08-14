@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./styles.css";
+import "./operational.css";
 
 export const metadata: Metadata = {
   title: "AFTiFest Mission Control",

@@ -14,5 +14,9 @@ All prototype defaults and development fixtures are **SAMPLE / UNAPPROVED** unti
 | Deadlines | Seeded August 2026 deadlines may be outdated. | Review and approve current deadlines. |
 | Readiness | Readiness is an unweighted average of department progress. | Define evidence, weights, owners, thresholds, and calculation governance. |
 | Reports and milestones | Existing submissions, targets, and milestone states are illustrative. | Validate or replace every record. |
+| Phase 2B department metadata | PostgreSQL now supports health, readiness, membership, lead flags, lifecycle, and metadata, but no real department structure or lead is approved. | Approve department taxonomy, membership, leads, health vocabulary, and archival policy. |
+| Operational task workflow | Statuses, priorities, progress, assignments, due dates, and dependencies are supported structurally; no real operational workload is approved. | Approve task status vocabulary, priority rules, reassignment authority, and due dates. |
+| Reporting configuration | Reporting periods, deadlines, review states, wins, blockers, and leadership requests are supported; no canonical reporting calendar exists. | Approve periods, deadlines, reviewer authority, status transitions, and versioning policy. |
+| Operational Readiness — PROVISIONAL | Phase 2B displays the arithmetic mean of non-null readiness values for authorized active departments as a provisional signal only. Missing values are excluded and an empty set displays zero. | Approve evidence requirements, weights, thresholds, owners, refresh cadence, and whether this metric should exist. |
 
 No implementation may silently resolve these discrepancies.

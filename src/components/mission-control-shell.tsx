@@ -26,7 +26,7 @@ export async function MissionControlShell({ active, children }: { active: string
         <div className="brand"><span className="mark">iF</span><div><b>AFTiFest Mission Control</b><small>Alignment • Accountability • Action</small></div></div>
         <nav aria-label="Mission Control modules">
           {navigation.filter(([, label]) => label !== "Governance Room" || canDecide).map(([icon, label]) => (
-            <a className={label === active ? "active" : ""} href={label === "Governance Room" ? "/decision-center" : label === active ? "#" : `#${label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`} key={label}>
+            <a className={label === active ? "active" : ""} href={label === "Governance Room" ? "/decision-center" : label === "Executive Overview" ? "/" : label === "Departments & People" ? "/departments" : label === "Tasks & Accountability" ? "/tasks" : label === "Department Reports" ? "/reports" : label === active ? "#" : `#${label.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`} key={label}>
               <span>{icon}</span>{label}
             </a>
           ))}
