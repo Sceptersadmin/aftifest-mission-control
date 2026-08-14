@@ -18,7 +18,7 @@ from (values
  ('10000000-0000-4000-8000-000000000006'::uuid,'admin-a@test.invalid','TEST Super Admin A'),
  ('20000000-0000-4000-8000-000000000001'::uuid,'user-b@test.invalid','TEST User B')) v(id,email,label);
 
-select pg_temp.assert_true((select count(*)=7 from public.profiles where email like '%@test.invalid'), 'profile trigger');
+select pg_temp.assert_true((select count(*)=7 from public.profiles where id::text like '10000000-%' or id::text like '20000000-%'), 'profile trigger');
 
 insert into public.organizations(id,name,slug,metadata) values
  ('10000000-0000-4000-8000-000000000000','Organization A - TEST / SAMPLE','org-a-test','{"classification":"TEST / SAMPLE"}'),
@@ -61,10 +61,16 @@ where r.key in ('test_executive','test_admin') and p.key in ('sponsor.read','dec
 insert into public.role_permissions
 select r.id,p.id from public.roles r cross join public.permissions p
 where r.key='test_admin' and p.key in ('workspace.admin','sponsor.manage','content.manage','resource.manage','brain.manage','agent.configure');
+insert into public.role_permissions
+select '22000000-0000-4000-8000-000000000001',p.id from public.permissions p where p.key='brain.read_restricted';
 
 insert into public.departments(id,organization_id,name) values
  ('13000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000000','TEST Department A'),
  ('23000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000000','TEST Department B');
+-- Phase 1.7 requires department membership for department-visible tasks.
+insert into public.department_members(department_id,organization_member_id) values
+ ('13000000-0000-4000-8000-000000000001','11000000-0000-4000-8000-000000000001'),
+ ('23000000-0000-4000-8000-000000000001','22000000-0000-4000-8000-000000000001');
 insert into public.tasks(id,organization_id,department_id,title) values
  ('14000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000000','13000000-0000-4000-8000-000000000001','TEST Task A'),
  ('24000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000000','23000000-0000-4000-8000-000000000001','TEST Task B');

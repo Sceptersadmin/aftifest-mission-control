@@ -12,7 +12,7 @@ from (values
  ('71000000-0000-4000-8000-000000000005','advisory@test.invalid'),('71000000-0000-4000-8000-000000000006','patron@test.invalid'),
  ('71000000-0000-4000-8000-000000000007','admin@test.invalid'),('71000000-0000-4000-8000-000000000008','restricted@test.invalid'),
  ('72000000-0000-4000-8000-000000000001','cross-org@test.invalid'))v(id,email);
-select pg_temp.ok((select count(*)=9 from public.profiles where email like '%@test.invalid'),'auth profile trigger');
+select pg_temp.ok((select count(*)=9 from public.profiles where id::text like '71000000-%' or id::text like '72000000-%'),'auth profile trigger');
 
 insert into public.organizations(id,name,slug) values
  ('71000000-0000-4000-8000-000000000000','Organization A TEST / SAMPLE','org-a-security-test'),

@@ -18,7 +18,7 @@ export async function MissionControlShell({ active, children }: { active: string
   const can = async (permission: string) => organizationId
     ? (await supabase.rpc("has_permission", { target_organization_id: organizationId, requested_permission: permission })).data === true
     : false;
-  const [canDecide, canUseBrain, canUseAgents] = await Promise.all([can("decision.read"), can("brain.read"), can("agent.read")]);
+  const [canDecide, canUseBrain, canUseAgents, canAdmin] = await Promise.all([can("decision.read"), can("brain.read"), can("agent.read"), can("workspace.admin")]);
   const initials = (user.email ?? "MC").slice(0, 2).toUpperCase();
   return (
     <div className="appShell">
@@ -34,6 +34,7 @@ export async function MissionControlShell({ active, children }: { active: string
           {canDecide && <a href="/decision-center"><span>◇</span>Decision Center</a>}
           {canUseBrain && <a href="/company-brain"><span>⌁</span>Company Brain</a>}
           {canUseAgents && <a href="/agents"><span>◎</span>Agent Registry</a>}
+          {canAdmin && <a href="/administration"><span>⚙</span>Administration</a>}
         </nav>
         <div className="sideCard"><b>Phase 1 security posture</b><p>Local foundation. No production infrastructure or autonomous actions.</p><div className="bar"><i style={{ width: "72%" }} /></div></div>
       </aside>

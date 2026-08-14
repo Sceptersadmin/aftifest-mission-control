@@ -6,11 +6,13 @@ import { createClient } from "@supabase/supabase-js";
 
 export const E2E_EMAIL = "phase17-member@test.invalid";
 export const E2E_PASSWORD = "TEST-Only-Password-123!";
+export const E2E_ADMIN_EMAIL = "phase2a-admin@test.invalid";
 
 const organizationId = "81000000-0000-4000-8000-000000000001";
 const roleId = "81000000-0000-4000-8000-000000000002";
 const authorizedSourceId = "81000000-0000-4000-8000-000000000003";
 const restrictedSourceId = "81000000-0000-4000-8000-000000000004";
+const adminRoleId = "81000000-0000-4000-8000-000000000005";
 
 function dockerCommand() {
   if (process.platform !== "win32") return "docker";
@@ -54,18 +56,37 @@ export async function provisionE2E() {
   }
   if (!user) throw new Error("E2E TEST user provisioning returned no user.");
 
+  let adminUser = users.users.find((candidate) => candidate.email === E2E_ADMIN_EMAIL);
+  if (adminUser) {
+    adminUser = await must(admin.auth.admin.updateUserById(adminUser.id, { password: E2E_PASSWORD, email_confirm: true, user_metadata: { display_name: "Phase 2A E2E TEST Administrator" } }), "update TEST administrator").then((data) => data.user);
+  } else {
+    adminUser = await must(admin.auth.admin.createUser({ email: E2E_ADMIN_EMAIL, password: E2E_PASSWORD, email_confirm: true, user_metadata: { display_name: "Phase 2A E2E TEST Administrator" } }), "create TEST administrator").then((data) => data.user);
+  }
+  if (!adminUser) throw new Error("E2E TEST administrator provisioning returned no user.");
+
   const sql = `
     insert into public.organizations(id,name,slug,metadata) values('${organizationId}','Organization A - E2E TEST / SAMPLE','organization-a-e2e-test','{"classification":"TEST / SAMPLE"}')
       on conflict(id) do update set name=excluded.name,metadata=excluded.metadata;
     insert into public.roles(id,organization_id,key,name,description,is_system) values('${roleId}','${organizationId}','e2e_team_member','E2E TEST Team Member','Minimum Playwright capabilities',false)
       on conflict(id) do update set name=excluded.name,description=excluded.description;
+    insert into public.roles(id,organization_id,key,name,description,is_system) values('${adminRoleId}','${organizationId}','e2e_phase2a_admin','E2E TEST Phase 2A Administrator','TEST-only administration capabilities',false)
+      on conflict(id) do update set name=excluded.name,description=excluded.description;
+    delete from public.user_provisioning_requests where organization_id='${organizationId}' and email='playwright-provisioned@test.invalid';
     insert into public.organization_members(organization_id,profile_id,status) values('${organizationId}','${user.id}','active')
       on conflict(organization_id,profile_id) do update set status='active';
     insert into public.member_roles(organization_member_id,role_id)
       select id,'${roleId}' from public.organization_members where organization_id='${organizationId}' and profile_id='${user.id}'
       on conflict do nothing;
+    insert into public.organization_members(organization_id,profile_id,status) values('${organizationId}','${adminUser.id}','active')
+      on conflict(organization_id,profile_id) do update set status='active';
+    insert into public.member_roles(organization_member_id,role_id)
+      select id,'${adminRoleId}' from public.organization_members where organization_id='${organizationId}' and profile_id='${adminUser.id}'
+      on conflict do nothing;
     insert into public.role_permissions(role_id,permission_id)
       select '${roleId}',id from public.permissions where key in ('department.read','task.read','report.submit','content.read','resource.read','brain.read','agent.read')
+      on conflict do nothing;
+    insert into public.role_permissions(role_id,permission_id)
+      select '${adminRoleId}',id from public.permissions where key in ('workspace.admin','organization.manage','user.provision','membership.manage','role.manage','audit.read','audit.read_restricted')
       on conflict do nothing;
     insert into public.company_brain_items(id,organization_id,title,summary,source_type,source_reference,classification,visibility,verification_status) values
       ('${authorizedSourceId}','${organizationId}','Authorized TEST source','TEST / SAMPLE organization source','test','TEST / SAMPLE','internal','organization','verified'),
